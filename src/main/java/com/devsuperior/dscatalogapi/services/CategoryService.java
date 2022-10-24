@@ -6,6 +6,8 @@ import com.devsuperior.dscatalogapi.entities.Category;
 import com.devsuperior.dscatalogapi.exceptionhandler.excpetions.ResourceNotFoundException;
 import com.devsuperior.dscatalogapi.repositories.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,5 +56,16 @@ public class CategoryService {
         } catch (EntityNotFoundException e) {
             throw new ResourceNotFoundException(format("Category not found for id: %s", id));
         }
+    }
+
+    public void deleteById(Long id) {
+        try {
+            categoryRepository.deleteById(id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new ResourceNotFoundException(format("Category not found for id: %s", id));
+        } catch (DataIntegrityViolationException e) {
+
+        }
+
     }
 }

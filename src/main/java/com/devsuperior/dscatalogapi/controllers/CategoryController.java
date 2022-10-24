@@ -5,11 +5,10 @@ import com.devsuperior.dscatalogapi.entities.Category;
 import com.devsuperior.dscatalogapi.services.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -26,7 +25,22 @@ public class CategoryController {
     }
 
     @GetMapping("{id}")
-    public CategoryDTO findById(@PathVariable Long id) {
-        return categoryService.findById(id);
+    public ResponseEntity<CategoryDTO> findById(@PathVariable Long id) {
+        CategoryDTO category = categoryService.findById(id);
+        return ResponseEntity.ok().body(category);
     }
+
+    @PostMapping
+    public ResponseEntity<CategoryDTO> save(@RequestBody CategoryDTO categoryDTO) {
+        categoryDTO = categoryService.save(categoryDTO);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(categoryDTO.getId()).toUri();
+        return ResponseEntity.created(uri).body(categoryDTO);
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity<CategoryDTO> update(@PathVariable Long id, @RequestBody CategoryDTO categoryDTO) {
+        categoryDTO = categoryService.update(id, categoryDTO);
+        return ResponseEntity.ok().body(categoryDTO);
+    }
+
 }

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,9 +30,29 @@ public class CategoryService {
         return categoryConverter.createFromEntities(categories);
     }
 
+    @Transactional(readOnly = true)
     public CategoryDTO findById(Long id) {
         Optional<Category> optionalCategory = categoryRepository.findById(id);
         Category category = optionalCategory.orElseThrow(() -> new ResourceNotFoundException(format("Category not found for id: %s", id)));
         return categoryConverter.convertFromEntity(category);
+    }
+
+    @Transactional
+    public CategoryDTO save(CategoryDTO categoryDTO) {
+        Category category = categoryConverter.convertFromDto(categoryDTO);
+        category = categoryRepository.save(category);
+        return categoryConverter.convertFromEntity(category);
+    }
+
+    @Transactional
+    public CategoryDTO update(Long id, CategoryDTO categoryDTO) {
+        try {
+            Category category = categoryRepository.getReferenceById(id);
+            category.setName(categoryDTO.getName());
+            category = categoryRepository.save(category);
+            return categoryConverter.convertFromEntity(category);
+        } catch (EntityNotFoundException e) {
+            throw new ResourceNotFoundException(format("Category not found for id: %s", id));
+        }
     }
 }

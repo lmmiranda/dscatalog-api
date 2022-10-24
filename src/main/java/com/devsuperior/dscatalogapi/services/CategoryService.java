@@ -3,6 +3,7 @@ package com.devsuperior.dscatalogapi.services;
 import com.devsuperior.dscatalogapi.convertes.CategoryConverter;
 import com.devsuperior.dscatalogapi.dtos.CategoryDTO;
 import com.devsuperior.dscatalogapi.entities.Category;
+import com.devsuperior.dscatalogapi.exceptionhandler.excpetions.BusinessException;
 import com.devsuperior.dscatalogapi.exceptionhandler.excpetions.ResourceNotFoundException;
 import com.devsuperior.dscatalogapi.repositories.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +65,7 @@ public class CategoryService {
         } catch (EmptyResultDataAccessException e) {
             throw new ResourceNotFoundException(format("Category not found for id: %s", id));
         } catch (DataIntegrityViolationException e) {
-
+            throw new BusinessException("Could not delete category because it has related products");
         }
 
     }

@@ -2,6 +2,7 @@ package com.devsuperior.dscatalogapi.entities;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Objects;
 
 @Entity
@@ -13,6 +14,12 @@ public class Category {
     private Long id;
 
     private String name;
+
+    @Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
+    private Instant createdAt;
+
+    @Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
+    private Instant updatedAt;
 
     public Category() {
     }
@@ -33,6 +40,24 @@ public class Category {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = Instant.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = Instant.now();
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
     }
 
     public Long getId() {

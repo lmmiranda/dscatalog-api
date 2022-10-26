@@ -1,6 +1,7 @@
 package com.devsuperior.dscatalogapi.dtos;
 
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Set;
 
 public class ProductDTO {
@@ -17,7 +18,7 @@ public class ProductDTO {
 
     private Instant date;
 
-    private Set<CategoryDTO> categories;
+    private Set<CategoryDTO> categories = new HashSet<>();
 
     public ProductDTO() {
     }

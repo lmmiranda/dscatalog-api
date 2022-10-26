@@ -1,11 +1,11 @@
 package com.devsuperior.dscatalogapi.services;
 
-import com.devsuperior.dscatalogapi.convertes.CategoryConverter;
 import com.devsuperior.dscatalogapi.dtos.CategoryDTO;
 import com.devsuperior.dscatalogapi.entities.Category;
 import com.devsuperior.dscatalogapi.exceptionhandler.excpetions.BusinessException;
 import com.devsuperior.dscatalogapi.exceptionhandler.excpetions.ResourceNotFoundException;
 import com.devsuperior.dscatalogapi.repositories.CategoryRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.List;
 import java.util.Optional;
 
 import static java.lang.String.format;
@@ -27,26 +26,26 @@ public class CategoryService {
     private CategoryRepository categoryRepository;
 
     @Autowired
-    private CategoryConverter categoryConverter;
+    private ModelMapper modelMapper;
 
     @Transactional(readOnly = true)
-    public Page<CategoryDTO> findAllPaged(PageRequest pageRequest) {
-        Page<Category> categoryPage = categoryRepository.findAll(pageRequest);
-        return categoryPage.map(category -> categoryConverter.convertFromEntity(category));
+    public Page<CategoryDTO> findAll(PageRequest pageRequest) {
+        Page<Category> categoriesPage = categoryRepository.findAll(pageRequest);
+        return categoriesPage.map(category -> convertFromEntity(category));
     }
 
     @Transactional(readOnly = true)
     public CategoryDTO findById(Long id) {
         Optional<Category> optionalCategory = categoryRepository.findById(id);
         Category category = optionalCategory.orElseThrow(() -> new ResourceNotFoundException(format("Category not found for id: %s", id)));
-        return categoryConverter.convertFromEntity(category);
+        return convertFromEntity(category);
     }
 
     @Transactional
     public CategoryDTO save(CategoryDTO categoryDTO) {
-        Category category = categoryConverter.convertFromDto(categoryDTO);
+        Category category = convertFromDto(categoryDTO);
         category = categoryRepository.save(category);
-        return categoryConverter.convertFromEntity(category);
+        return convertFromEntity(category);
     }
 
     @Transactional
@@ -55,7 +54,7 @@ public class CategoryService {
             Category category = categoryRepository.getReferenceById(id);
             category.setName(categoryDTO.getName());
             category = categoryRepository.save(category);
-            return categoryConverter.convertFromEntity(category);
+            return convertFromEntity(category);
         } catch (EntityNotFoundException e) {
             throw new ResourceNotFoundException(format("Category not found for id: %s", id));
         }
@@ -70,5 +69,13 @@ public class CategoryService {
             throw new BusinessException("Could not delete category because it has related products");
         }
 
+    }
+
+    private CategoryDTO convertFromEntity(Category category) {
+        return modelMapper.map(category, CategoryDTO.class);
+    }
+
+    private Category convertFromDto(CategoryDTO categoryDTO) {
+        return modelMapper.map(categoryDTO, Category.class);
     }
 }

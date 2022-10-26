@@ -26,14 +26,14 @@ public class CategoryController {
                                                      @RequestParam(value = "direction", defaultValue = "DESC") String direction,
                                                      @RequestParam(value = "orderBy", defaultValue = "name") String orderBy) {
         PageRequest pageRequest = PageRequest.of(page, linesPerPage, Sort.Direction.valueOf(direction), orderBy);
-        Page<CategoryDTO> categoryPage = categoryService.findAllPaged(pageRequest);
-        return ResponseEntity.ok().body(categoryPage);
+        Page<CategoryDTO> categoriesPage = categoryService.findAll(pageRequest);
+        return ResponseEntity.ok().body(categoriesPage);
     }
 
     @GetMapping("{id}")
     public ResponseEntity<CategoryDTO> findById(@PathVariable Long id) {
-        CategoryDTO category = categoryService.findById(id);
-        return ResponseEntity.ok().body(category);
+        CategoryDTO categoryDTO = categoryService.findById(id);
+        return ResponseEntity.ok().body(categoryDTO);
     }
 
     @PostMapping

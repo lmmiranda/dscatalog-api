@@ -12,7 +12,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,9 +34,9 @@ public class ProductService {
     private ModelMapper modelMapper;
 
     @Transactional(readOnly = true)
-    public Page<ProductDTO> findAll(PageRequest pageRequest) {
-        Page<Product> productsPage = productRepository.findAll(pageRequest);
-        return productsPage.map(product -> convertFromEntity(product));
+    public Page<ProductDTO> findAll(Pageable pageable) {
+        Page<Product> productsPage = productRepository.findAll(pageable);
+        return productsPage.map(this::convertFromEntity);
     }
 
     @Transactional(readOnly = true)
